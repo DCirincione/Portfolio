@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Danny Cirincione</title>
+    <link rel="stylesheet" href="/static/style.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css" />
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500&family=DM+Mono:wght@400;500&display=swap"
+        rel="stylesheet" />
+</head>
+
+<body>
+    <div class="page">
+
+        <div class="hero">
+            <p class="hero-eyebrow">Software Engineer</p>
+            <h1 class="hero-name">Daniel Cirincione</h1>
+            <p class="hero-title">CS Graduate · University of Tampa</p>
+            <p class="hero-tagline">Computer Science graduate from the University of Tampa with hands-on experience building and deploying full-stack web
+            applications used by real clients and institutions. Proficient in Python, SQL, and backend development with a focus on
+            data-driven applications, REST APIs, and database architecture using PostgreSQL and Supabase. Passionate about backend
+            engineering and data analysis with a proven history of delivering production-ready software.</p>
+            <a class="resume-btn" href="/static/resume.pdf" target="_blank">
+                <i class="ti ti-download"></i>
+                View Resume
+            </a>
+        </div>
+
+        <div class="section">
+            <p class="section-label">Deployed Projects</p>
+            <div class="project-grid" id="deployed-grid">
+                <p class="loading-text">Loading projects...</p>
+            </div>
+        </div>
+
+        <div class="section">
+            <p class="section-label">Interactive Demos</p>
+            <div class="project-grid" id="interactive-grid">
+                <p class="loading-text">Loading demos...</p>
+            </div>
+        </div>
+
+        <div class="section">
+            <p class=""section-label">Work Experience</p>
+            <div class=""project-grid id="work-grid">
+                <p class="loading-text">Loading work experience...</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        async function loadProjects() {
+            try {
+                const res = await fetch('/api/projects');
+                const projects = await res.json();
+
+                const deployed = projects.filter(p => !p.is_interactive);
+                const interactive = projects.filter(p => p.is_interactive);
+
+                renderCards('deployed-grid', deployed);
+                renderCards('interactive-grid', interactive);
+            } catch (err) {
+                console.error('Failed to load projects:', err);
+            }
+        }
+
+        function renderCards(containerId, projects) {
+            const grid = document.getElementById(containerId);
+            if (!projects.length) {
+                grid.innerHTML = '<p class="loading-text">No projects found.</p>';
+                return;
+            }
+            grid.innerHTML = projects.map(p => `
+        <div class="project-card ${p.is_interactive ? 'interactive-card' : ''}">
+          ${p.is_interactive ? `<span class="badge">Python · AI</span>` : ''}
+          <p class="card-tag">${p.category}</p>
+          <p class="card-title">${p.name}</p>
+          <p class="card-desc">${p.description}</p>
+          <div class="card-footer">
+            <span class="card-stack">${p.tech_stack}</span>
+            ${p.live_url
+                    ? `<a class="card-link" href="${p.live_url}" target="_blank"><i class="ti ti-external-link"></i> View</a>`
+                    : `<a class="card-link" href="/demo/${p.id}"><i class="ti ti-player-play"></i> Run</a>`
+                }
+          </div>
+        </div>
+      `).join('');
+        }
+
+        loadProjects();
+    </script>
+</body>
+</html>
