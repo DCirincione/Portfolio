@@ -11,6 +11,16 @@
         rel="stylesheet" />
 </head>
 
+<nav class="navbar">
+    <a href="#" class="nav-name">Daniel Cirincione</a>
+    <div class="nav-links">
+        <a href="#projects">Projects</a>
+        <a href="#demos">Demos</a>
+        <a href="#experience">Experience</a>
+    </div>
+</nav>
+
+
 <body>
     <div class="page">
 
@@ -19,32 +29,34 @@
             <h1 class="hero-name">Daniel Cirincione</h1>
             <p class="hero-title">CS Graduate · University of Tampa</p>
             <p class="hero-tagline">Computer Science graduate from the University of Tampa with hands-on experience building and deploying full-stack web
-            applications used by real clients and institutions. Proficient in Python, SQL, and backend development with a focus on
-            data-driven applications, REST APIs, and database architecture using PostgreSQL and Supabase. Passionate about backend
-            engineering and data analysis with a proven history of delivering production-ready software.</p>
+            applications used by real clients and institutions. Proficient in Python, SQL, and backend development with a focus on data-driven applications, REST APIs, and database architecture using PostgreSQL and Supabase. </p>
             <a class="resume-btn" href="/static/resume.pdf" target="_blank">
                 <i class="ti ti-download"></i>
                 View Resume
             </a>
+            <a class="github-btn" href="https://github.com/DCirincione" target="_blank">
+                <i class="ti ti-link"></i>
+                View Github
+            </a>
         </div>
 
-        <div class="section">
+        <div class="section", id="projects">
             <p class="section-label">Deployed Projects</p>
-            <div class="project-grid" id="deployed-grid">
+            <div class="project-list" id="deployed-list">
                 <p class="loading-text">Loading projects...</p>
             </div>
         </div>
 
-        <div class="section">
+        <div class="section", id="demos">
             <p class="section-label">Interactive Demos</p>
-            <div class="project-grid" id="interactive-grid">
+            <div class="project-list" id="interactive-list">
                 <p class="loading-text">Loading demos...</p>
             </div>
         </div>
 
-        <div class="section">
-            <p class=""section-label">Work Experience</p>
-            <div class=""project-grid id="work-grid">
+        <div class="section", id="experience">
+            <p class="section-label">Work Experience</p>
+            <div class="project-list" id="work-list">
                 <p class="loading-text">Loading work experience...</p>
             </div>
         </div>
@@ -59,8 +71,8 @@
                 const deployed = projects.filter(p => !p.is_interactive);
                 const interactive = projects.filter(p => p.is_interactive);
 
-                renderCards('deployed-grid', deployed);
-                renderCards('interactive-grid', interactive);
+                renderCards('deployed-list', deployed);
+                renderCards('interactive-list', interactive);
             } catch (err) {
                 console.error('Failed to load projects:', err);
             }
@@ -74,7 +86,7 @@
             }
             grid.innerHTML = projects.map(p => `
         <div class="project-card ${p.is_interactive ? 'interactive-card' : ''}">
-          ${p.is_interactive ? `<span class="badge">Python · AI</span>` : ''}
+          ${p.is_interactive ? `<span class="badge">${p.language}</span>` : ''}
           <p class="card-tag">${p.category}</p>
           <p class="card-title">${p.name}</p>
           <p class="card-desc">${p.description}</p>
@@ -88,8 +100,46 @@
         </div>
       `).join('');
         }
+        
+    async function loadWork() {
+        try {
+            const res = await fetch('/api/work');
+            const work = await res.json();
+            const container = document.getElementById('work-list');
+            if (!work.length) {
+                container.innerHTML = '<p class="loading-text">No work experience found.</p>';
+                return;
+            }
+            container.innerHTML = work.map(w => `
+            <div class="work-card">
+                <div class="work-header">
+                    <div>
+                        <p class="work-title">${w.title}</p>
+                        <p class="work-company">${w.company}</p>
+                    </div>
+                    <p class="work-dates">${w.start_date} – ${w.end_date}</p>
+                </div>
+                <p class="work-desc">${w.description}</p>
+            </div>
+        `).join('');
+        } catch (err) {
+            console.error('Failed to load work:', err);
+        }
+    }
 
         loadProjects();
+        loadWork();
     </script>
+
+<footer class="footer">
+    <p class="footer-name">Daniel Cirincione</p>
+    <div class="footer-links">
+        <a href="mailto:danny.cirincione@gmail.com">Danny.cirincione@gmail.com</a>
+        <a href="https://www.linkedin.com/in/daniel-cirincione/" target="_blank">LinkedIn</a>
+        <a href="https://github.com/DCirincione" target="_blank">GitHub</a>
+    </div>
+    <p class="footer-copy">© 2026 Daniel Cirincione</p>
+</footer>
+    
 </body>
 </html>

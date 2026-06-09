@@ -25,3 +25,8 @@ def home(request: Request):
 def get_projects():
     response = supabase.table("projects").select("*").order("display_order").execute()
     return response.data
+
+@app.get("/api/work")
+def get_work():
+    response = supabase.table("work").select("*").order("display_order").execute()
+    return response.data
