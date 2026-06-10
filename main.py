@@ -39,3 +39,7 @@ def project_page(request: Request, project_id: int):
 def get_project(project_id: int):
     response = supabase.table("projects").select("*").eq("id", project_id).single().execute()
     return response.data
+
+@app.get("/about")
+def about_page(request: Request):
+    return templates.TemplateResponse(request, "about.html")

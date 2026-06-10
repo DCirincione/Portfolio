@@ -393,4 +393,16 @@ body {
     
 }
 
+.about-content {
+    max-width: 720px;
+}
+
+.about-text {
+    font-size: 15px;
+    color: var(--color-text-secondary);
+    line-height: 1.75;
+    margin-bottom: 1.25rem;
+    white-space: pre-wrap;
+}
+
 
