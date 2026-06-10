@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Project | Daniel Cirincione</title>
+    <link rel="stylesheet" href="/static/style.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css" />
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500&family=DM+Mono:wght@400;500&display=swap"
+        rel="stylesheet" />
+</head>
+
+<body>
+    <nav class="navbar">
+        <a href="/" class="nav-name">Daniel Cirincione</a>
+        <div class="nav-links">
+            <a href="/#projects">Projects</a>
+            <a href="/#demos">Demos</a>
+            <a href="/#experience">Experience</a>
+        </div>
+    </nav>
+
+    <div class="page" id="project-container">
+        <p class="loading-text">Loading project...</p>
+    </div>
+
+    <footer class="footer">
+        <p class="footer-name">Daniel Cirincione</p>
+        <div class="footer-links">
+            <a href="mailto:danny.cirincione@gmail.com">danny.cirincione@gmail.com</a>
+            <a href="https://linkedin.com/in/yourprofile" target="_blank">LinkedIn</a>
+            <a href="https://github.com/DCirincione" target="_blank">GitHub</a>
+        </div>
+        <p class="footer-copy">© 2026 Daniel Cirincione</p>
+    </footer>
+
+    <script>
+        const projectId = window.location.pathname.split('/').pop();
+
+        async function loadProject() {
+            try {
+                const res = await fetch(`/api/projects/${projectId}`);
+                const p = await res.json();
+                document.title = `${p.name} | Daniel Cirincione`;
+                renderProject(p);
+            } catch (err) {
+                console.error('Failed to load project:', err);
+            }
+        }
+
+        function renderProject(p) {
+            const container = document.getElementById('project-container');
+            container.innerHTML = `
+                <div class="project-detail">
+
+                    <div class="project-detail-header">
+                        <a href="/" class="back-link"><i class="ti ti-arrow-left"></i> Back</a>
+                        <p class="hero-eyebrow">${p.category}</p>
+                        <h1 class="hero-name">${p.name}</h1>
+                        <p class="card-stack" style="margin-bottom: 1.5rem;">${p.tech_stack}</p>
+                        <div class="project-detail-actions">
+                            ${p.live_url ? `<a class="resume-btn" href="${p.live_url}" target="_blank"><i class="ti ti-external-link"></i> View Live</a>` : ''}
+                            ${p.github_url ? `<a class="resume-btn" href="${p.github_url}" target="_blank"><i class="ti ti-brand-github"></i> View on GitHub</a>` : ''}
+                            ${p.is_interactive && !p.live_url ? `<a class="resume-btn" href="/demo/${p.id}"><i class="ti ti-player-play"></i> Run Demo</a>` : ''}
+                        </div>
+                    </div>
+
+                    <div class="project-detail-body">
+                        <div class="section">
+                            <p class="section-label">About this project</p>
+                            <p class="project-full-desc">${p.page_description || p.description}</p>
+                        </div>
+                    </div>
+
+                </div>
+            `;
+        }
+
+        loadProject();
+    </script>
+</body>
+
+</html>

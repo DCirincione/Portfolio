@@ -32,7 +32,7 @@
             <p class="hero-eyebrow">Software Engineer</p>
             <h1 class="hero-name">Daniel Cirincione</h1>
             <p class="hero-title">CS Graduate · University of Tampa</p>
-            <p class="hero-tagline">Computer Science graduate from the University of Tampa with hands-on experience building and deploying full-stack web
+            <p class="hero-tagline">Computer Science graduate with a minor in Mathematics from the University of Tampa with hands-on experience building and deploying full-stack web
             applications used by real clients and institutions. Proficient in Python, SQL, and backend development with a focus on data-driven applications, REST APIs, and database architecture using PostgreSQL and Supabase. </p>
             <a class="resume-btn" href="/static/resume.pdf" target="_blank">
                 <i class="ti ti-download"></i>
@@ -92,7 +92,7 @@
         <div class="project-card ${p.is_interactive ? 'interactive-card' : ''}">
           ${p.is_interactive ? `<span class="badge">${p.language}</span>` : ''}
           <p class="card-tag">${p.category}</p>
-          <p class="card-title">${p.name}</p>
+          <a class="card-title-link" href="/project/${p.id}"><p class="card-title">${p.name}</p></a>
           <p class="card-desc">${p.description}</p>
           <div class="card-footer">
             <span class="card-stack">${p.tech_stack}</span>

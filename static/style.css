@@ -230,6 +230,16 @@ body {
     margin-bottom: 0.4rem;
 }
 
+.card-title-link {
+    text-decoration: none;
+    color: inherit;
+}
+
+.card-title-link:hover .card-title{
+    color: var(--color-accent);
+    transition: color 0.15s;
+}
+
 .card-desc {
     font-size: 13px;
     color: var(--color-text-secondary);
@@ -345,3 +355,42 @@ body {
     font-size: 12px;
     color: var(--color-text-tertiary);
 }
+
+
+.back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    color: var(--color-text-tertiary);
+    text-decoration: none;
+    margin-bottom: 1.5rem;
+    transition: color 0.15s;
+}
+
+.back-link:hover {
+    color: var(--color-text-primary);
+}
+
+.project-detail-header {
+    padding: 2.5rem 0 2rem;
+    border-bottom: 0.5px solid var(--color-border-light);
+    margin-bottom: 2.5rem;
+}
+
+.project-detail-actions {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.project-full-desc {
+    font-size: 15px;
+    color: var(--color-text-secondary);
+    line-height: 1.75;
+    max-width: 720px;
+    white-space: pre-wrap;  
+    
+}
+
+

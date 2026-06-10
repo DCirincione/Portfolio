@@ -30,3 +30,12 @@ def get_projects():
 def get_work():
     response = supabase.table("work").select("*").order("display_order").execute()
     return response.data
+
+@app.get("/project/{project_id}")
+def project_page(request: Request, project_id: int):
+    return templates.TemplateResponse(request, "project.html", {"project_id": project_id})
+    
+@app.get("/api/projects/{project_id}")
+def get_project(project_id: int):
+    response = supabase.table("projects").select("*").eq("id", project_id).single().execute()
+    return response.data
