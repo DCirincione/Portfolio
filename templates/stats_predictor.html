@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>NFL Stat Predictor | Daniel Cirincione</title>
+    <link rel="stylesheet" href="/static/style.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css" />
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500&family=DM+Mono:wght@400;500&display=swap"
+        rel="stylesheet" />
+    <link rel="icon" href="/static/favicon.png" type="image/png" />
+    <style>
+        .wrap {
+            max-width: 1100px;
+            margin: 32px auto 48px;
+            padding: 0 28px;
+            display: grid;
+            gap: 18px;
+        }
+
+        .card {
+            background: #1a1a1a;
+            border: 0.5px solid var(--color-border-light);
+            border-radius: 16px;
+            padding: 18px;
+        }
+
+        .card h1 {
+            margin: 0 0 10px;
+            font-size: 28px;
+            color: var(--color-text-primary);
+        }
+
+        form {
+            display: grid;
+            gap: 14px;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            align-items: end;
+        }
+
+        label {
+            display: grid;
+            gap: 6px;
+            font-weight: 500;
+            color: var(--color-text-secondary);
+            font-size: 13px;
+        }
+
+        select,
+        input {
+            padding: 12px;
+            border-radius: 12px;
+            border: 0.5px solid var(--color-border-medium);
+            background: #111111;
+            color: var(--color-text-primary);
+            font-family: var(--font-sans);
+        }
+
+        button {
+            padding: 14px 18px;
+            border-radius: 12px;
+            border: 0.5px solid var(--color-border-medium);
+            background: var(--color-accent);
+            color: white;
+            font-weight: 500;
+            cursor: pointer;
+            font-family: var(--font-sans);
+        }
+
+        button:hover {
+            opacity: 0.9;
+        }
+
+        .table-card {
+            display: grid;
+            gap: 12px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            color: var(--color-text-primary);
+        }
+
+        th,
+        td {
+            padding: 10px 8px;
+            border-bottom: 0.5px solid var(--color-border-light);
+            text-align: left;
+            font-size: 14px;
+        }
+
+        th {
+            color: var(--color-text-tertiary);
+            font-weight: 500;
+            cursor: pointer;
+        }
+
+        tr:hover {
+            background: rgba(255, 255, 255, 0.03);
+        }
+
+        .pill {
+            background: #1a1a1a;
+            border: 0.5px solid var(--color-border-light);
+            padding: 6px 10px;
+            border-radius: 999px;
+            color: var(--color-text-tertiary);
+            font-size: 12px;
+        }
+
+        .opp-header {
+            text-align: center;
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .opp-cell {
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .muted {
+            color: var(--color-text-tertiary);
+            font-size: 14px;
+        }
+
+        .info-banner {
+            background: #1e3a5f;
+            border: 0.5px solid var(--color-accent);
+            border-radius: 8px;
+            padding: 12px 16px;
+            margin-bottom: 16px;
+            font-size: 13px;
+            color: var(--color-text-secondary);
+        }
+    </style>
+</head>
+
+<body>
+    <nav class="navbar">
+        <a href="/" class="nav-name">Daniel Cirincione</a>
+        <div class="nav-links">
+            <a href="/#projects">Projects</a>
+            <a href="/#demos">Demos</a>
+            <a href="/#experience">Experience</a>
+            <a href="/about">About</a>
+        </div>
+    </nav>
+
+    <div class="wrap">
+        <div class="card">
+            <h1>NFL Stat Predictor</h1>
+            <p class="muted">Choose position, season, and scoring to fetch projections for the upcoming week
+                (auto-detected). Results will render below.</p>
+            <form>
+                <label>Position
+                    <select name="position">
+                        <option>WR</option>
+                        <option>RB</option>
+                        <option>QB</option>
+                        <option>TE</option>
+                    </select>
+                </label>
+                <label>Season
+                    <input type="number" name="season" value="2025" min="2015" max="2026">
+                </label>
+                <label>Scoring
+                    <select name="scoring">
+                        <option value="ppr">PPR</option>
+                        <option value="half">Half PPR</option>
+                        <option value="standard">Standard</option>
+                    </select>
+                </label>
+                <label>Number of Players
+                    <input type="number" name="top" value="10" min="5" max="50">
+                </label>
+                <div style="display:flex;align-items:flex-end;gap:10px;">
+                    <button type="button" onclick="fetchResults()">Get Results</button>
+                    <span class="pill" id="status-pill">Ready</span>
+                </div>
+            </form>
+        </div>
+
+        <div class="card table-card">
+            <div style="display:flex;align-items:center;gap:10px;">
+                <h2 style="margin:0;color:var(--color-text-primary);">Results</h2>
+                <span class="pill" id="result-kind">Pending</span>
+            </div>
+            <div id="table-container" class="muted">Run a search to see data.</div>
+        </div>
+    </div>
+
+    <script>
+        const statusPill = document.getElementById("status-pill");
+        const tableContainer = document.getElementById("table-container");
+        const resultKind = document.getElementById("result-kind");
+
+        async function fetchResults() {
+            const form = document.querySelector("form");
+            const params = new URLSearchParams(new FormData(form));
+            statusPill.textContent = "Loading...";
+            resultKind.textContent = "Projection";
+            try {
+                const res = await fetch("/api/nfl/projections?" + params.toString());
+                const data = await res.json();
+                if (!res.ok) throw new Error(data.error || "Failed to load");
+                const rows = data.rows || [];
+                const weekLabel = data.mode === "prediction"
+                    ? `Week ${rows[0]?.predicted_week} (Predicted)`
+                    : `Week ${data.week} (Last Completed Week)`;
+
+                if (data.mode === "historical") {
+                    tableContainer.innerHTML = `<div class="info-banner">
+                        <i class="ti ti-info-circle" style="color: var(--color-accent); margin-right: 6px;"></i>
+                        The 2026 NFL season hasn't started yet. Showing top performers from Week ${data.week} of the most recently completed season. Predictions will be available once the season begins.
+                    </div>`;
+                } else {
+                    tableContainer.innerHTML = '';
+                }
+
+                renderTable(rows, weekLabel);
+                statusPill.textContent = "Success";
+            } catch (err) {
+                statusPill.textContent = "Error";
+                tableContainer.innerHTML = `<div class="muted">Error: ${err.message}</div>`;
+            }
+        }
+
+        function formatValue(val) {
+            if (val === null || val === undefined) return "";
+            if (typeof val === "number") return Number.isInteger(val) ? val.toString() : val.toFixed(2);
+            return val;
+        }
+
+        function renderTable(rows, badge) {
+            if (!rows || rows.length === 0) {
+                tableContainer.innerHTML += "<div class='muted'>No data.</div>";
+                return;
+            }
+            const offenseCols = ["player_name", "player", "team", "predicted_week", "week", "predicted_fantasy_points", "fantasy_points", "fp_prev1", "fp_roll3", "fp_roll5", "fp_season_avg"];
+            const defenseCols = ["def_team", "def_fp_prev1", "def_fp_roll3", "def_fp_roll5", "def_fp_season_avg"];
+            const labels = {
+                player_name: "Player", player: "Player", team: "Team", predicted_week: "Week", week: "Week",
+                predicted_fantasy_points: "Projected FP", fantasy_points: "Fantasy Points",
+                fp_prev1: "Last Game", fp_roll3: "Last 3 Avg", fp_roll5: "Last 5 Avg", fp_season_avg: "Season Avg",
+                def_team: "Defense", def_fp_prev1: "Def Last Game", def_fp_roll3: "Def Last 3 Avg",
+                def_fp_roll5: "Def Last 5 Avg", def_fp_season_avg: "Def Season Avg",
+            };
+            const keysAll = Object.keys(rows[0]);
+            const offense = offenseCols.filter(k => keysAll.includes(k));
+            const defense = defenseCols.filter(k => keysAll.includes(k));
+            const keys = [...offense, ...defense];
+            const headerGroup = `<tr><th colspan="${offense.length}"></th>${defense.length ? `<th class="opp-header" colspan="${defense.length}">Opponent Stats</th>` : ''}</tr>`;
+            const headerLabels = `<tr>${keys.map(k => `<th data-key="${k}">${labels[k] || k}</th>`).join("")}</tr>`;
+            const body = rows.map(r => `<tr>${offense.map(k => `<td>${formatValue(r[k])}</td>`).join("")}${defense.map(k => `<td class="opp-cell">${formatValue(r[k])}</td>`).join("")}</tr>`).join("");
+            tableContainer.innerHTML += `<table><thead>${headerGroup}${headerLabels}</thead><tbody>${body}</tbody></table>`;
+            if (badge) resultKind.textContent = badge;
+        }
+    </script>
+</body>
+
+</html>

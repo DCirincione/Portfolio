@@ -110,6 +110,8 @@ def demo_page(request: Request, project_id: int):
     if project_id == 5:
         game_num = random.randint(0, len(all_games) - 1)
         return templates.TemplateResponse(request, "watchgame.html", {"game_num": game_num})
+    if project_id == 6:
+        return templates.TemplateResponse(request, "stats_predictor.html")
     
 @app.get("/getplayers/")
 def getplayers(game: int = 0):
@@ -132,3 +134,31 @@ def gamemove(num: int, game: int = 0):
     if num >= len(movelist):
         return {"Row": -1, "Col": -1, "Direction": "W"}
     return movelist[num]
+
+
+###Ai NFL predictor
+import sys
+sys.path.insert(0, 'AiNFLProject')
+
+@app.get("/demo/6")
+def nfl_demo(request: Request):
+    return templates.TemplateResponse(request, "stats_predictor.html")
+
+@app.get("/api/nfl/projections")
+async def get_nfl_projections(position: str = "WR", season: int = 2025, scoring: str = "ppr", top: int = 10):
+    try:
+        import sys
+        sys.path.insert(0, 'AiNFLProject')
+        from fantasy_ml import predict_upcoming_week_topn
+        from nfl import get_top_players_week
+        try:
+            df = predict_upcoming_week_topn(season=season, position=position, scoring=scoring, top_n=top)
+            return {"rows": df.to_dict(orient="records"), "mode": "prediction"}
+        except (ValueError, ConnectionError, Exception) as e:
+            if "No schedule data" in str(e) or "404" in str(e) or "Not Found" in str(e):
+                fallback_season = season - 1 if "404" in str(e) or "Not Found" in str(e) else season
+                week, df = get_top_players_week(season=fallback_season, week=None, position=position, top_n=top, scoring=scoring)
+                return {"rows": df.to_dicts(), "week": week, "mode": "historical"}
+            raise e
+    except Exception as e:
+        return {"error": str(e), "type": type(e).__name__}
