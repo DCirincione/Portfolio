@@ -22,7 +22,6 @@ charset-normalizer==3.2.0
 click==8.4.1
 comm==0.1.4
 cryptography==42.0.5
-CSC201UT @ git+https://github.com/jgourd/CSC201UT@798ffd4b662991a1d682202275e2bf0e4e879db0
 debugpy==1.8.0
 decorator==5.1.1
 defusedxml==0.7.1
@@ -171,7 +170,6 @@ uri-template==1.3.0
 urllib3==2.0.5
 uvicorn==0.49.0
 uvloop==0.22.1
-vboxapi==1
 watchfiles==1.2.0
 wcwidth==0.2.6
 webcolors==1.13
