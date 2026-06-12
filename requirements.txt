@@ -8,8 +8,3 @@ python-dotenv==1.0.1
 httpx==0.28.1
 pydantic==2.11.7
 starlette==1.2.1
-nflreadpy
-polars
-scikit-learn
-pandas
-pyarrow

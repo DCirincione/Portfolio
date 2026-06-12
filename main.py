@@ -145,20 +145,22 @@ def nfl_demo(request: Request):
     return templates.TemplateResponse(request, "stats_predictor.html")
 
 @app.get("/api/nfl/projections")
-async def get_nfl_projections(position: str = "WR", season: int = 2025, scoring: str = "ppr", top: int = 10):
+def get_nfl_projections(position: str = "WR", season: int = 2025, scoring: str = "ppr", top: int = 10):
     try:
-        import sys
-        sys.path.insert(0, 'AiNFLProject')
-        from fantasy_ml import predict_upcoming_week_topn
-        from nfl import get_top_players_week
-        try:
-            df = predict_upcoming_week_topn(season=season, position=position, scoring=scoring, top_n=top)
-            return {"rows": df.to_dict(orient="records"), "mode": "prediction"}
-        except (ValueError, ConnectionError, Exception) as e:
-            if "No schedule data" in str(e) or "404" in str(e) or "Not Found" in str(e):
-                fallback_season = season - 1 if "404" in str(e) or "Not Found" in str(e) else season
-                week, df = get_top_players_week(season=fallback_season, week=None, position=position, top_n=top, scoring=scoring)
-                return {"rows": df.to_dicts(), "week": week, "mode": "historical"}
-            raise e
+        response = supabase.table("nfl_predictions")\
+            .select("*")\
+            .eq("position", position.upper())\
+            .eq("season", season)\
+            .eq("scoring", scoring)\
+            .order("predicted_fantasy_points", desc=True)\
+            .limit(top)\
+            .execute()
+        
+        if not response.data:
+            return {"error": "No predictions found for these parameters", "rows": [], "mode": "historical"}
+        
+        mode = response.data[0].get("mode", "historical")
+        week = response.data[0].get("week", 0)
+        return {"rows": response.data, "week": week, "mode": mode}
     except Exception as e:
         return {"error": str(e), "type": type(e).__name__}
