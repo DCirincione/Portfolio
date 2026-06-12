@@ -4,6 +4,8 @@ from fastapi.staticfiles import StaticFiles
 from supabase import create_client
 from dotenv import load_dotenv
 import os
+import json
+import random
 
 load_dotenv(".env.local")
 
@@ -43,3 +45,90 @@ def get_project(project_id: int):
 @app.get("/about")
 def about_page(request: Request):
     return templates.TemplateResponse(request, "about.html")
+
+
+###Interactive Prudh Project
+all_games = {}
+def load_game_log(filepath, game_num):
+    import sys
+    sys.path.insert(0, 'prudhaProject')
+    import GameRules as Grules
+
+    statelist = []
+    movelist = []
+    players = {}
+
+    def initial_state(filename):
+        logfile = open(filename)
+        line_num = 0
+        for line in logfile:
+            if line_num == 4:
+                return json.loads(line)
+            line_num += 1
+        return {}
+    
+    game_state = initial_state(filepath)
+    logfile = open(filepath)
+    line_num = 0
+
+    for line in logfile:
+        if line_num == 0:
+            words = line.split()
+            players['Light'] = words[3]
+        if line_num == 1:
+            words = line.split()
+            players['Dark'] = words[3]
+        if line_num == 2:
+            words = line.split()
+            game_state['Turn'] = words[0]
+        if line[0] == "{":
+            dict = json.loads(line)
+            if 'Row' in dict:
+                game_state = Grules.playMove(game_state, dict)
+                movelist.append(dict)
+            else:
+                game_state = dict
+            statelist.append(game_state)
+        line_num += 1
+
+    all_games[game_num] = {
+        'statelist': statelist,
+        'movelist': movelist,
+        'players': players
+    }
+
+def load_all_games():
+    game_dir = 'prudhaProject/game_data'
+    for i, filename in enumerate(sorted(os.listdir(game_dir))):
+        if filename.endswith('.log'):
+            load_game_log(os.path.join(game_dir, filename), i)
+
+load_all_games()
+
+@app.get("/demo/{project_id}")
+def demo_page(request: Request, project_id: int):
+    if project_id == 5:
+        game_num = random.randint(0, len(all_games) - 1)
+        return templates.TemplateResponse(request, "watchgame.html", {"game_num": game_num})
+    
+@app.get("/getplayers/")
+def getplayers(game: int = 0):
+    return all_games[game]['players']
+
+@app.get("/gamestate/{num}")
+def gamestate(num: int, game: int = 0):
+    statelist = all_games[game]['statelist']
+    if num < 0:
+        num = 0
+    if num >= len(statelist):
+        num = len(statelist) - 1
+    return statelist[num]
+
+@app.get("/gamemove/{num}")
+def gamemove(num: int, game: int = 0):
+    movelist = all_games[game]['movelist']
+    if num < 0:
+        num = 0
+    if num >= len(movelist):
+        return {"Row": -1, "Col": -1, "Direction": "W"}
+    return movelist[num]

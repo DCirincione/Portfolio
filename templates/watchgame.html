@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <link rel="stylesheet" href="/static/style.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css" />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500&family=DM+Mono:wght@400;500&display=swap"
+    rel="stylesheet" />
+  <link rel="icon" href="/static/favicon.png" type="image/png" />
+  <script>const GAME_NUM = {{ game_num }};</script>
+  <script src="/static/watchgame.js"></script>
+</head>
+
+<body onload="initializeState();" style="user-select: none;">
+
+  <nav class="navbar">
+    <a href="/" class="nav-name">Daniel Cirincione</a>
+    <div class="nav-links">
+      <a href="/#projects">Projects</a>
+      <a href="/#demos">Demos</a>
+      <a href="/#experience">Experience</a>
+      <a href="/about">About</a>
+    </div>
+  </nav>
+
+  <h1 class="heading-class" id="matchup">No One (Dark) vs No One (Light)</h1>
+  <h1 class="heading-class">Move <b id="move_num">0</b></h1>
+  <p class="center-para" id="gameboard">... The Game Will Begin Shortly</p>
+  <h1 class="heading-class"><b id="cur_player">Dark</b> Player's Turn</h1>
+  <h1 class="heading-class">
+    Light Captures: <b id="light_cap">0</b> &nbsp;&nbsp;&nbsp;
+    Dark Captures: <b id="dark_cap">0</b>
+  </h1>
+
+</body>
+
+</html>
