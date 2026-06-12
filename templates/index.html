@@ -14,6 +14,15 @@
         window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
     </script>
     <script defer src="/_vercel/insights/script.js"></script>
+    <script>
+        if (window.location.hash) {
+            window.scrollTo(0, 0);
+            setTimeout(() => {
+                const el = document.querySelector(window.location.hash);
+                if (el) el.scrollIntoView({ behavior: 'smooth' });
+            }, 600);
+        }
+    </script>
 </head>
 
 <nav class="navbar">
@@ -62,7 +71,7 @@
         </div>
 
         <div class="section", id="other-projects">
-            <p class="section-label">Class Projects</p>
+            <p class="section-label">Other Projects</p>
             <div class="project-list" id="github-list">
                 <p class="loading-text">Loading projects...</p>
             </div>
@@ -102,23 +111,25 @@
                 return;
             }
             grid.innerHTML = projects.map(p => `
+        <a href="/project/${p.id}" class="card-link-wrapper">
         <div class="project-card ${p.is_interactive ? 'interactive-card' : ''}">
-          ${p.is_interactive ? `<span class="badge">${p.language}</span>` : ''}
-          <p class="card-tag">${p.category}</p>
-          <a class="card-title-link" href="/project/${p.id}"><p class="card-title">${p.name}</p></a>
-          <p class="card-desc">${p.description}</p>
-          <div class="card-footer">
+            ${p.is_interactive ? `<span class="badge">${p.language}</span>` : ''}
+            <p class="card-tag">${p.category}</p>
+            <p class="card-title">${p.name}</p>
+            <p class="card-desc">${p.description}</p>
+            <div class="card-footer">
             <span class="card-stack">${p.tech_stack}</span>
             ${p.live_url
-                ? `<a class="card-link" href="${p.live_url}" target="_blank"><i class="ti ti-external-link"></i> View</a>`
-                : p.is_interactive
-                    ? `<a class="card-link" href="/demo/${p.id}"><i class="ti ti-player-play"></i> Run</a>`
-                    : p.github_url
-                        ? `<a class="card-link" href="${p.github_url}" target="_blank"><i class="ti ti-brand-github"></i> GitHub</a>`
-                        : ''
+                            ? `<span class="card-link" onclick="event.preventDefault(); event.stopPropagation(); window.open('${p.live_url}', '_blank')"><i class="ti ti-external-link"></i> View</span>`
+                            : p.is_interactive
+                                ? `<span class="card-link" onclick="event.preventDefault(); event.stopPropagation(); window.location='/demo/${p.id}'"><i class="ti ti-player-play"></i> Run</span>`
+                                : p.github_url
+                                    ? `<span class="card-link" onclick="event.preventDefault(); event.stopPropagation(); window.open('${p.github_url}', '_blank')"><i class="ti ti-brand-github"></i> GitHub</span>`
+                                    : ''
             }
-          </div>
+            </div>
         </div>
+        </a>
       `).join('');
         }
         
@@ -150,6 +161,18 @@
 
         loadProjects();
         loadWork();
+
+        window.addEventListener('load', () => {
+                const hash = window.location.hash;
+                if (hash) {
+                    setTimeout(() => {
+                        const el = document.querySelector(hash);
+                        if (el) {
+                            el.scrollIntoView({ behavior: 'smooth' });
+                        }
+                    }, 500);
+                }
+            });
     </script>
 
 <footer class="footer">

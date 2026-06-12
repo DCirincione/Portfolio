@@ -405,4 +405,12 @@ body {
     white-space: pre-wrap;
 }
 
+.card-link-wrapper {
+    text-decoration: none;
+    color: inherit;
+    display: block;
+}
 
+.card-link-wrapper:hover .project-card {
+    border-color: var(--color-border-medium);
+}
