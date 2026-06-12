@@ -19,8 +19,9 @@
 <nav class="navbar">
     <a href="#" class="nav-name">Daniel Cirincione</a>
     <div class="nav-links">
-        <a href="#projects">Projects</a>
+        <a href="#projects">Deployed Projects</a>
         <a href="#demos">Demos</a>
+        <a href="/#other-projects">Other Projects</a>
         <a href="#experience">Experience</a>
         <a href="/about">About</a>
     </div>
@@ -60,6 +61,13 @@
             </div>
         </div>
 
+        <div class="section", id="other-projects">
+            <p class="section-label">Class Projects</p>
+            <div class="project-list" id="github-list">
+                <p class="loading-text">Loading projects...</p>
+            </div>
+        </div>
+
         <div class="section", id="experience">
             <p class="section-label">Work Experience</p>
             <div class="project-list" id="work-list">
@@ -74,11 +82,14 @@
                 const res = await fetch('/api/projects');
                 const projects = await res.json();
 
-                const deployed = projects.filter(p => !p.is_interactive);
+                const deployed = projects.filter(p => !p.is_interactive && p.live_url);
                 const interactive = projects.filter(p => p.is_interactive);
+                const github_only = projects.filter(p => !p.is_interactive && !p.live_url && p.github_url);
 
                 renderCards('deployed-list', deployed);
                 renderCards('interactive-list', interactive);
+                renderCards('github-list', github_only);
+
             } catch (err) {
                 console.error('Failed to load projects:', err);
             }
@@ -99,9 +110,13 @@
           <div class="card-footer">
             <span class="card-stack">${p.tech_stack}</span>
             ${p.live_url
-                    ? `<a class="card-link" href="${p.live_url}" target="_blank"><i class="ti ti-external-link"></i> View</a>`
-                    : `<a class="card-link" href="/demo/${p.id}"><i class="ti ti-player-play"></i> Run</a>`
-                }
+                ? `<a class="card-link" href="${p.live_url}" target="_blank"><i class="ti ti-external-link"></i> View</a>`
+                : p.is_interactive
+                    ? `<a class="card-link" href="/demo/${p.id}"><i class="ti ti-player-play"></i> Run</a>`
+                    : p.github_url
+                        ? `<a class="card-link" href="${p.github_url}" target="_blank"><i class="ti ti-brand-github"></i> GitHub</a>`
+                        : ''
+            }
           </div>
         </div>
       `).join('');
